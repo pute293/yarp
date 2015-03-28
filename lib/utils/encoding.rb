@@ -1,6 +1,6 @@
 # coding: ascii-8bit
 
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   Encodings = ::Encoding.name_list.reject{|enc|/ascii/i=~enc}.select{|enc|::Encoding::Converter.search_convpath(enc, 'UTF-8') rescue false}.select{|enc| enc=::Encoding.find(enc);enc && !enc.dummy?}.freeze
   
@@ -35,7 +35,7 @@ module PDF::Utils::Encoding
   #  else
   #    path = File.expand_path("../encoding/#{name}", __FILE__)
   #    raise ArgumentError, "cmap file #{name} not found" unless FileTest.file?(path)
-  #    ps = PDF::Parser::PostScriptParser.new(File.read(path))
+  #    ps = YARP::Parser::PostScriptParser.new(File.read(path))
   #    cmap = ps.resources.fetch(:CMap)
   #    cmap.dup.shift[1][:'.codemap']
   #  end

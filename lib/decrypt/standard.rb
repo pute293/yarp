@@ -4,7 +4,7 @@ require 'digest/md5'
 require 'openssl'
 require_relative 'arc4'
 
-module PDF::Decrypt
+module YARP::Decrypt
   class Standard
     
     # password is used for only initialize key

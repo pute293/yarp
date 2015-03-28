@@ -2,7 +2,7 @@
 
 require_relative 'predictor'
 
-module PDF::Filter
+module YARP::Filter
   module Lzw
     
     # LZW decoder with predictor

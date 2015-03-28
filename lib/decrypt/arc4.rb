@@ -6,7 +6,7 @@
 # OpenSSL::Cipher::RC4 usually supports key length just 40 and 128,
 # so re-implement RC4 algorithm for arbitrary key length
 
-module PDF::Decrypt
+module YARP::Decrypt
   class Arc4
     @@R = Random.new  # for random_key method
     @@B = ''.b.freeze   # empty string

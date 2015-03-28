@@ -1,7 +1,7 @@
 require 'stringio'
 require 'set'
 
-module PDF
+module YARP
   
   class InvalidEncoding < InvalidPdfError; end
   class InvalidFontFormat < InvalidPdfError; end
@@ -120,7 +120,7 @@ module PDF
     end
     
     def warn_once(str, id)
-      warn @warned[id] = str if (PDF.warning? && @warned[id].nil?)
+      warn @warned[id] = str if (YARP.warning? && @warned[id].nil?)
     end
     
     def remove_surrogate(enum)
@@ -311,7 +311,7 @@ module PDF
       descend = descendant
       info = descend.fetch(:CIDSystemInfo)
       ros = "#{info[:Registry]}-#{info[:Ordering]}"
-      umap_file = PDF::Utils::Encoding.cid2unicode(ros)
+      umap_file = YARP::Utils::Encoding.cid2unicode(ros)
       umap = create_umap(umap_file) if umap_file
       umap = nil if (umap.nil? || umap.empty?)
       @umaps.push(umap) if umap
@@ -327,14 +327,14 @@ module PDF
       when Stream 
         enc, @encoding = @encoding, :Custom
         create_cmap(enc.stream)
-      else create_cmap(PDF::Utils::Encoding.code2cid(@encoding))
+      else create_cmap(YARP::Utils::Encoding.code2cid(@encoding))
       end
       
       # create width array
       # each group (item) of /Width array is one in two formats below:
       # 1. n [ w0 w1 ... w_m ]  => n:w0, n+1:w1, ..., n+m:w_m
       # 2. n1 n2 w              => n1:w, n1+1:w, ... n2:w
-      tmp_warn, PDF.warning = PDF.warning, false
+      tmp_warn, YARP.warning = YARP.warning, false
       dw = descend[:DW]
       @width.default = dw ? dw / 1000.0 : 1.0
       cid2uni = case
@@ -362,7 +362,7 @@ module PDF
         else raise 'must not happen'
         end
       end
-      PDF.warning = tmp_warn
+      YARP.warning = tmp_warn
     end
     
     private
@@ -498,12 +498,12 @@ module PDF
         l ||= w.size - 1
         l = 255 if 255 < l
         w ||= Hash.new(500)
-        tmp_warn, PDF.warning = PDF.warning, false
+        tmp_warn, YARP.warning = YARP.warning, false
         f.upto(l) do |i|
           uni = decode(i.chr) rescue nil
           @width[uni] = (w[i - f] || 0) / 1000.0
         end
-        PDF.warning = tmp_warn
+        YARP.warning = tmp_warn
       end
     end
     

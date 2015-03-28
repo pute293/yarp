@@ -1,4 +1,4 @@
-module PDF::Utils
+module YARP::Utils
   
   class RingBuffer < Hash
     def initialize(max_size=1024)

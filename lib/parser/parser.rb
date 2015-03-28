@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module PDF
+module YARP
   module Parser
     module ParserBase
       

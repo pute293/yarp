@@ -1,6 +1,6 @@
 require 'optparse'
 
-module PDF
+module YARP
   
   class << self
     alias :method_missing_old :method_missing
@@ -38,7 +38,7 @@ module PDF
   opts.banner = banner.gsub(indent, opts.summary_indent).gsub(bar, '-' * banner.lines.first.size)
   opts.version = version
   
-  opts.on('-f', '--font', 'update font cache') { PDF.update_font; exit(0) }
+  opts.on('-f', '--font', 'update font cache') { YARP.update_font; exit(0) }
   opts.on_tail('-h', '--help', 'show this message') { puts opts; puts '=' * banner.lines.first.size; exit(0) }
   opts.on_tail('-v', '--version', 'show version') { puts opts.version; exit(0) }
   
@@ -50,7 +50,7 @@ module PDF
     f = ARGV.shift
     next unless FileTest.file?(f)
     ARGV.clear
-    PDF.open(f) do |doc|
+    YARP.open(f) do |doc|
       puts f
       repl(doc)
     end

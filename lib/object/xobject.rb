@@ -1,4 +1,4 @@
-module PDF
+module YARP
   
   class XObject < Stream
     def initialize(*args)

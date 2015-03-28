@@ -5,7 +5,7 @@ require 'monitor'
 require_relative 'pdf.tab'
 require_relative 'pdf.lex'
 
-module PDF::Parser
+module YARP::Parser
   class ObjectParser
     
     attr_reader :v, :xrefs, :document_id
@@ -34,7 +34,7 @@ module PDF::Parser
         else encrypts[0]
         end
       @encrypted = !@encrypt_obj.nil?
-      @dec = @encrypted ? PDF::Decrypt.create(@encrypt_obj, @document_id) : nil
+      @dec = @encrypted ? YARP::Decrypt.create(@encrypt_obj, @document_id) : nil
     end
     
     # @io offset will not change.
@@ -68,7 +68,7 @@ module PDF::Parser
       @xrefs.find do |xref|
         entry = xref.find {|entry|entry.num == n && entry.gen == g}
       end
-      raise PDF::InvalidPdfError, "#{n}/#{g} not found" if entry.nil?
+      raise YARP::InvalidPdfError, "#{n}/#{g} not found" if entry.nil?
       offset = entry.offset
       if offset < 0
         warn "$ realize #{entry}"

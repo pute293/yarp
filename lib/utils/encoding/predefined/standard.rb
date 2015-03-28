@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   # StandardEncoding is 1 char/byte encoding,
   # same as Ascii for range 0x20-0x7e.

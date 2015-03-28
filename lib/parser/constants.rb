@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # define regular expressions for scanner
-module PDF::Parser
+module YARP::Parser
   
   # special chars
   PDF_WHITE_SPACE = "\x00\x09\x0A\x0C\x0D\x20"

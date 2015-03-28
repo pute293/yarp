@@ -1,6 +1,6 @@
 require 'monitor'
 
-module PDF::Utils
+module YARP::Utils
   
   class ConcurrentHash < Object
     def initialize(*ifnone)

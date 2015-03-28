@@ -5,10 +5,10 @@ require_relative 'ops.tab'
 require_relative 'ops.lex'
 require_relative 'graphicstate'
 
-module PDF::Parser
+module YARP::Parser
   class OperationParser
     
-    include PDF::Utils
+    include YARP::Utils
     
     def self.parse(str)
       ps = self.new
@@ -25,7 +25,7 @@ module PDF::Parser
       #@yydebug = true
       @bx = false
       @scanner = nil
-      @gs_stack = [PDF::GraphicState.new]
+      @gs_stack = [YARP::GraphicState.new]
       @op_handler = {}
     end
     

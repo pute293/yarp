@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module PDF::Filter
+module YARP::Filter
   module Ccitt
     def self.decode(raw_bytes, params)
       k = params.nil? ? 0 : params[:K]

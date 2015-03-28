@@ -1,4 +1,4 @@
-class PDF::Parser::PostScriptParser
+class YARP::Parser::PostScriptParser
 token
   # keyword
   PS_TRUE PS_FALSE PS_NULL # true false null

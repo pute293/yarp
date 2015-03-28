@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'stringio'
 
-module PDF::Filter
+module YARP::Filter
   module RunLength
     
     # simple byte-oriented run-length decoder

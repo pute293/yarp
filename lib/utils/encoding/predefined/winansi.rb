@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   # WinAnsiEncoding is 1 char/byte encoding,
   # extention of Latin-1

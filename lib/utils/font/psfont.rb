@@ -1,4 +1,4 @@
-module PDF::Utils::Font
+module YARP::Utils::Font
   
   class PsFont < FontBase
     
@@ -121,7 +121,7 @@ module PDF::Utils::Font
       gid2code = dict[:Encoding]
       @cmap = if gid2code && !gid2code.empty?
         code2name = gid2code.each_with_index.reject{|code, gid|code.nil?}.collect{|code, gid| [code.chr, @gid2name[gid]]}.reject{|code, name| name.nil?}
-        table = PDF::Utils::Encoding::NameToUnicode
+        table = YARP::Utils::Encoding::NameToUnicode
         code2name = code2name.collect{|code, name| [code, table[name]]}.reject{|code, uni| uni.nil?}
         Hash[*code2name.flatten(1)]
       else nil

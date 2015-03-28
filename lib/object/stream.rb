@@ -1,6 +1,6 @@
 require 'stringio'
 
-module PDF
+module YARP
   
   class InvalidStreamError < InvalidPdfError; end
   

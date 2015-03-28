@@ -1,4 +1,4 @@
-module PDF
+module YARP
   
   begin
     require 'narray'

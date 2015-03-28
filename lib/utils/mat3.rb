@@ -1,6 +1,6 @@
-module PDF::Utils
+module YARP::Utils
 
-if PDF::NARRAY
+if YARP::NARRAY
   
   module Vec2
     def self.new(*args)

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module PDF::Parser
+module YARP::Parser
   class OperationParser
     
     RE_OPS    = /\A[^#{PDF_WORD_BREAK}]+/n

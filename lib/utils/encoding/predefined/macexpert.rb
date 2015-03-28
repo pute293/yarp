@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   MacExpertEncoding = Hash[
     [ nil,    nil,    nil,    nil,    nil,    nil,    nil,    nil,    # 00

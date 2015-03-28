@@ -1,4 +1,4 @@
-module PDF::Utils::Font
+module YARP::Utils::Font
   
   module TrueTypeCollection
     def self.new(*args)

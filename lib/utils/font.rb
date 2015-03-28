@@ -3,7 +3,7 @@ require 'yaml'
 require 'stringio'
 require 'pathname'
 
-module PDF::Utils
+module YARP::Utils
   module Font
     
     class InvalidFontFormat < StandardError; end
@@ -17,7 +17,7 @@ module PDF::Utils
       
       def FontCache.update_async
         @done = false
-        Thread.new(self, PDF.Config.fetch('font-path')) do |hash, font_path|
+        Thread.new(self, YARP.Config.fetch('font-path')) do |hash, font_path|
           puts 'updating font cache...'
           font_path.each do |path|
             path = Pathname.new(path)
@@ -96,7 +96,7 @@ module PDF::Utils
         if header[0] == 0x100 && (1..4).include?(header[2]) # when this is cff file, first 2 bytes are major/minor version (should be 1/0) and byte of offset 3 is offSize (1..4 integer)
           Type2
         elsif 0x20 <= magic[0].ord  # started with printable characters; which means this file may be PostScript
-          ps = PDF::Parser::PostScriptParser.new
+          ps = YARP::Parser::PostScriptParser.new
           if header[0] == 0x8001
             # type1 binary file (pfb)
             ps.binmode

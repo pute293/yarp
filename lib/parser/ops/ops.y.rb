@@ -1,4 +1,4 @@
-class PDF::Parser::OperationParser
+class YARP::Parser::OperationParser
 token
   # keyword
   PDF_TRUE PDF_FALSE PDF_NULL # true false null

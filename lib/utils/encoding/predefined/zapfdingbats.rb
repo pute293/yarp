@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   ZapfDingbatsEncoding = Hash[
     [ nil,    nil,    nil,    nil,    nil,    nil,    nil,    nil,    # 00

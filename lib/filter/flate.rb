@@ -3,7 +3,7 @@
 require 'zlib'
 require_relative 'predictor'
 
-module PDF::Filter
+module YARP::Filter
   module Flate
     
     # zlib decoder with predictor

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module PDF::Parser
+module YARP::Parser
   
   class PostScriptParser
     

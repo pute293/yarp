@@ -1,4 +1,4 @@
-module PDF
+module YARP
   
   VERSION = '0.0.1'.freeze
   

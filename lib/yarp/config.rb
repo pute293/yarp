@@ -1,6 +1,6 @@
 require 'yaml'
 
-module PDF
+module YARP
   
   begin
     config_file = "#{__dir__}/../config.yaml"

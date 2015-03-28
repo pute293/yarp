@@ -1,4 +1,4 @@
-module PDF::Parser
+module YARP::Parser
   class ObjectParser
     
     # parse one object (num gen obj ... endobj) or xref table (xref ... trailer << ... >>)
@@ -110,7 +110,7 @@ module PDF::Parser
           dict = @last_dict
             on_error('invalid stream; stream dictionary is not found') if dict.nil?
           len = dict[:Length]
-          len = len.data if len.kind_of?(PDF::Ref)
+          len = len.data if len.kind_of?(YARP::Ref)
             on_error('invalid stream; stream dictionary does not has Length field') if len.nil?
           pos = io.tell - $'.size   # start offset of stream content
           io.seek(pos + len)        # set io on end-of-stream
@@ -146,7 +146,7 @@ module PDF::Parser
               buf = $'
               num = s + i
               gen = $2.to_i
-              key = PDF::Ref.new(self, num, gen)
+              key = YARP::Ref.new(self, num, gen)
               hash[key] = {:offset => $1.to_i, :used => ($3 == 'n')}
             end
           end

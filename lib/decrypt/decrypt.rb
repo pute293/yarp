@@ -11,7 +11,7 @@
 
 require_relative 'standard'
 
-module PDF
+module YARP
   module Decrypt
     
     class InvalidEncryptDictionary < InvalidPdfError; end

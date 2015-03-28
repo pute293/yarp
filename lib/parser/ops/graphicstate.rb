@@ -1,4 +1,4 @@
-module PDF
+module YARP
   class GraphicState
     
     attr_accessor :ctm, :ts

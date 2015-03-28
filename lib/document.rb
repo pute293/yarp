@@ -1,4 +1,4 @@
-module PDF
+module YARP
   
   def self.open(name)
     Kernel.open(name, 'rb:ASCII-8BIT') do |io|

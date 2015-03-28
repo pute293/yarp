@@ -1,9 +1,9 @@
 # coding: utf-8
 
-# introduce PDF::Filter::* modules
+# introduce YARP::Filter::* modules
 # They have method :decode
 
-module PDF
+module YARP
   module Filter
     class FilterError < InvalidPdfError; end
   end

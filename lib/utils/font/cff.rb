@@ -1,4 +1,4 @@
-module PDF::Utils::Font
+module YARP::Utils::Font
   
   class InvalidCffFormat < InvalidFontFormat; end
   

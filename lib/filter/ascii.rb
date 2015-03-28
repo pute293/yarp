@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module PDF::Filter
+module YARP::Filter
   module AsciiHex
     def self.decode(raw_bytes, *args)
       eod_idx = raw_bytes.include?(?>) ? raw_bytes.index(?>) : raw_bytes.bytesize
@@ -37,7 +37,7 @@ module PDF::Filter
     
     private
     
-    if PDF::NARRAY
+    if YARP::NARRAY
     
       NUMS = NArray[[
         85 * 85 * 85 * 85,

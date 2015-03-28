@@ -1,6 +1,6 @@
 # coding: utf-8
 
-class PDF::Parser::ObjectParser
+class YARP::Parser::ObjectParser
 token
   # keyword
   PDF_TRUE PDF_FALSE PDF_NULL # true false null

@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   # The map from glyph name (ie. names in Adobe Glyph List; AGL) to
   # unicode codepoint(s).

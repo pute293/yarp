@@ -2,7 +2,7 @@
 
 require_relative 'tiff'
 
-module PDF::Filter
+module YARP::Filter
   module Predictor
     # PNG / TIFF Predictor
     # Note: PNG Filtering algorithm is done for each byte, regardless bit depth (BitsPerComponent).
@@ -26,7 +26,7 @@ module PDF::Filter
       
       case pred
       when 2
-        PDF::Filter::Tiff.decode(raw_bytes, params)
+        YARP::Filter::Tiff.decode(raw_bytes, params)
       when 10..15
         lines = raw_bytes.scan(/([\x00-\xff])([\x00-\xff]{#{bpr}})/n)
         above_line = [0] * bpr

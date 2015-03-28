@@ -3,8 +3,8 @@
 require 'digest/sha2'
 require 'openssl'
 
-module PDF::Decrypt
-  class Standard  # exntends PDF::Decrypt::Standard for R >= 5 revisions
+module YARP::Decrypt
+  class Standard  # exntends YARP::Decrypt::Standard for R >= 5 revisions
     
     private
     

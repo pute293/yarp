@@ -1,6 +1,6 @@
 require 'forwardable'
 
-module PDF
+module YARP
   
   class PdfObject
     
@@ -39,7 +39,7 @@ module PDF
     
     def in_stream?; @in_stream end
     
-    # for compatibility to PDF::Stream
+    # for compatibility to YARP::Stream
     def size; 0 end
     alias length size
     
@@ -121,7 +121,7 @@ module PDF
     private
     
     def warn(*args)
-      PDF.warn(*args)
+      YARP.warn(*args)
     end
     
     def define_method_missing(dict)

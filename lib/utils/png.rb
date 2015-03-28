@@ -2,7 +2,7 @@
 
 require 'zlib'
 
-module PDF::Utils
+module YARP::Utils
   # create png image
   class Png
   

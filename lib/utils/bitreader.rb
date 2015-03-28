@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module PDF::Utils
+module YARP::Utils
   class BitReader
     
     # endianness

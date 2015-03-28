@@ -1,4 +1,4 @@
-module PDF
+module YARP
   module Utils
   end
 end

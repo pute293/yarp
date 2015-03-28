@@ -5,7 +5,7 @@
 #
 
 require 'racc/parser.rb'
-module PDF
+module YARP
   module Parser
     class PostScriptParser < Racc::Parser
 ##### State transition tables begin ###
@@ -296,4 +296,4 @@ end
 
     end   # class PostScriptParser
     end   # module Parser
-  end   # module PDF
+  end   # module YARP

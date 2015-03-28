@@ -1,4 +1,4 @@
-module PDF
+module YARP
   
   class Ref
     attr_reader :num, :gen

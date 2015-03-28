@@ -1,4 +1,4 @@
-module PDF::Utils::Font
+module YARP::Utils::Font
   
   class FontBase
     attr_accessor :embedded
@@ -66,7 +66,7 @@ module PDF::Utils::Font
     private
     
     def warn(*args)
-      PDF.warn(*args)
+      YARP.warn(*args)
     end
     
   end

@@ -7,8 +7,8 @@ require_relative 'xobject'
 require_relative 'image'
 require_relative 'font'
 
-module PDF
-  class PdfObject   # factory method PDF::PdfObject.create
+module YARP
+  class PdfObject   # factory method YARP::PdfObject.create
     
     attr_reader :cache_needed
     

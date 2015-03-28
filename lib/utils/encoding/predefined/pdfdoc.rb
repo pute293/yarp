@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   # PDFDocEncoding is 1 char/byte encoding,
   # (used for only internal pdf program)

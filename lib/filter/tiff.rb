@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'zlib'
 
-module PDF::Filter
+module YARP::Filter
   module Tiff
     
     # TIFF(v6) deferential algorithm
@@ -68,7 +68,7 @@ module PDF::Filter
     end
     
     
-    if PDF::NARRAY
+    if YARP::NARRAY
     
       # bytes tiff decoder
       def self.decode_bytes(raw_bytes, colors, width, bpc)

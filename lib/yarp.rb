@@ -13,7 +13,7 @@
 
 raise LoadError, 'ruby version must be 2.0.0 or greater.' if RUBY_VERSION < '2.0.0'
 
-module PDF
+module YARP
   
   class InvalidPdfError < StandardError; end
   

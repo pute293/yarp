@@ -1,4 +1,4 @@
-module PDF::Utils::Encoding
+module YARP::Utils::Encoding
   
   # MacRomanEncoding is 1 char/byte encoding,
   # Some codes mapped as "Roman Encoding" used in Machintosh which MacRomanEncoding mapped to .notdef

@@ -1,4 +1,4 @@
-module PDF::Utils::Font
+module YARP::Utils::Font
   
   class TrueType < FontBase
     
@@ -186,7 +186,7 @@ module PDF::Utils::Font
       
       private
       def warn(*args)
-        PDF.warn(*args)
+        YARP.warn(*args)
       end
       
       class << self

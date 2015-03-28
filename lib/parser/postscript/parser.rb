@@ -5,7 +5,7 @@ require_relative 'ps.tab'
 require_relative 'ps.lex'
 require_relative 'misc/object'
 
-module PDF::Parser
+module YARP::Parser
   
   class PostScriptParser
     include ParserBase
@@ -83,14 +83,14 @@ module PDF::Parser
       rescue QuitCalled
         reset
       rescue PostScriptError => e
-        PDF.warn "PostScript Error: pos = #{scanner.pos}"
-        PDF.warn e
-        PDF.warn 'Operand Stack:'
+        YARP.warn "PostScript Error: pos = #{scanner.pos}"
+        YARP.warn e
+        YARP.warn 'Operand Stack:'
         ops = @ops.collect {|op| op.respond_to?(:to_string) ? op.to_string : op.to_s }
-        PDF.warn "    |- #{ops.join(' ')}"
-        #PDF.warn '===================================='
-        #PDF.warn @str
-        #PDF.warn '===================================='
+        YARP.warn "    |- #{ops.join(' ')}"
+        #YARP.warn '===================================='
+        #YARP.warn @str
+        #YARP.warn '===================================='
         raise
       end
     end
@@ -116,7 +116,7 @@ module PDF::Parser
         puts name.to_s.bytes.collect{|x|'%02x'%x}.join(' ')
         raise Undefined, "Name \"#{name}\" is not defined"
       else
-        PDF.warn "!!! WARN !!! Name \"#{name}\" is not defined; processed as Name"
+        YARP.warn "!!! WARN !!! Name \"#{name}\" is not defined; processed as Name"
         name
       end
     end
@@ -271,7 +271,7 @@ end
 
 # test
 =begin
-ps = PDF::Parser::PostScriptParser.new
+ps = YARP::Parser::PostScriptParser.new
 s0 = <<EOS
 /fact {
 1 dict begin
@@ -334,8 +334,8 @@ ps.reset
 ps.parse(s2)
 p ps.resources
 
-PDF.warning = true
-ps = PDF::Parser::PostScriptParser.new
+YARP.warning = true
+ps = YARP::Parser::PostScriptParser.new
 ps.parse(<<EOS)
 /{(vvv)==}def
 / cvx exec
@@ -358,8 +358,8 @@ clear
 a(B)anchorsearch pp
 clear
 EOS
-PDF.warning = true
-ps = PDF::Parser::PostScriptParser.new
+YARP.warning = true
+ps = YARP::Parser::PostScriptParser.new
 ps.parse(<<EOS)
 /X{
     true
@@ -383,8 +383,8 @@ puts
 p ps.operand_stack
 p ps.currentdict
 
-PDF.warning = true
-ps = PDF::Parser::PostScriptParser.new
+YARP.warning = true
+ps = YARP::Parser::PostScriptParser.new
 ps.strict = true
 #ps.parse("/a cvx pp cvlit pp cvx pp cvx pp")
 #ps.parse("/a load")

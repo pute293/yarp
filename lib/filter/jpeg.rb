@@ -4,7 +4,7 @@
 # and the raw data consists of whole file.
 # So filters defined here are return the raw data, without decompression.
 
-module PDF::Filter
+module YARP::Filter
   
   module Dct
     def self.decode(raw_bytes, *args)
