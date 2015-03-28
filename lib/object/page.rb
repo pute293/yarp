@@ -518,7 +518,7 @@ module PDF
         y0, y1 = [y0, y1].minmax
         mw, mh = w * @@margin_h, h * @@margin_v
         x0 -= mw; x1 += mw
-        y0 -= mw; y1 += mw
+        y0 -= mh; y1 += mh
         [x0, y0, x1, y1]
       end
       
