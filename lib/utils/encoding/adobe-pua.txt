@@ -1,0 +1,193 @@
+#original	glyph name	replacement	difference
+U+F6BE	dotlessj	U+0237	
+U+F6BF	LL	U+004C,U+004C	ligature
+U+F6C0	ll	U+006C,U+006C	ligature
+U+F6C3	commaaccent	U+00B8	CEDILLA
+U+F6C4	afii10063	(none)	
+U+F6C5	afii10064	(none)	
+U+F6C6	afii10192	(none)	
+U+F6C7	afii10831	(none)	
+U+F6C8	afii10832	(none)	
+U+F6C9	Acute	U+00B4	ignore position difference to /acute
+U+F6CA	Caron	U+02C7	ignore position difference to /caron
+U+F6CB	Dieresis	U+00A8	ignore position difference to /dieresis
+U+F6CC	DieresisAcute	U+0385	ignore position difference to /dieresisAcute
+U+F6CD	DieresisGrave	U+00A8,U+0300	ignore position difference to /dieresisgrave
+U+F6CE	Grave	U+0060	ignore position difference to /grave
+U+F6CF	Hungarumlaut	U+02DD	ignore position difference to /hungarumlaut
+U+F6D0	Macron	U+00AF	ignore position difference to /macron
+U+F6D1	cyrBreve	U+02D8	ignore position difference to /cyrbreve
+U+F6D2	cyrFlex	U+005E	ignore position difference to /cyrflex
+U+F6D3	dblGrave	U+02F5	ignore position difference to /dblgrave
+U+F6D4	cyrbreve	U+02D8	ignore position difference to /cyrBreve
+U+F6D5	cyrflex	U+005E	ignore position difference to /cyrFlex
+U+F6D6	dblgrave	U+02F5	ignore position difference to /dblGrave
+U+F6D7	dieresisacute	U+0385	ignore position difference to /dieresisAcute
+U+F6D8	dieresisgrave	U+00A8,U+0300	ignore position difference to /DieresisGrave
+U+F6D9	copyrightserif	U+00A9	ignore face of glyph
+U+F6DA	registerserif	U+00AE	ignore face of glyph
+U+F6DB	trademarkserif	U+2122	ignore face of glyph
+U+F6DC	onefitted	U+0031	
+U+F6DD	rupiah	U+0052,U+0070	ligature; U+20A8 RUPEE SIGN is "Rs"
+U+F6DE	threequartersemdash	U+2014	ignore length
+U+F6DF	centinferior	U+00A2	ignore position difference to /cent
+U+F6E0	centsuperior	U+00A2	ignore position difference to /cent
+U+F6E1	commainferior	U+002C	ignore position difference to /comma
+U+F6E2	commasuperior	U+002C	ignore position difference to /comma
+U+F6E3	dollarinferior	U+0024	ignore position difference to /dollar
+U+F6E4	dollarsuperior	U+0024	ignore position difference to /dollar
+U+F6E5	hypheninferior	U+002D	ignore position difference to /hyphen (alt. U+207B SUPERSCRIPT MINUS)
+U+F6E6	hyphensuperior	U+002D	ignore position difference to /hyphen (alt. U+208B SUBSCRIPT MINUS)
+U+F6E7	periodinferior	U+002E	ignore position difference to /period
+U+F6E8	periodsuperior	U+002E	ignore position difference to /period
+U+F6E9	asuperior	U+0061	ignore position difference to /a
+U+F6EA	bsuperior	U+0062	ignore position difference to /b
+U+F6EB	dsuperior	U+0064	ignore position difference to /d
+U+F6EC	esuperior	U+0065	ignore position difference to /e
+U+F6ED	isuperior	U+0069	ignore position difference to /i
+U+F6EE	lsuperior	U+006C	ignore position difference to /l
+U+F6EF	msuperior	U+006D	ignore position difference to /m
+U+F6F0	osuperior	U+006F	ignore position difference to /o
+U+F6F1	rsuperior	U+0072	ignore position difference to /r
+U+F6F2	ssuperior	U+0073	ignore position difference to /s
+U+F6F3	tsuperior	U+0074	ignore position difference to /t
+U+F6F4	Brevesmall	U+02D8	ignore width difference to /breve
+U+F6F5	Caronsmall	U+02C7	ignore width difference to /caron
+U+F6F6	Circumflexsmall	U+02C6	ignore width difference to /circumflex
+U+F6F7	Dotaccentsmall	U+02D9	ignore width difference to /dotaccent
+U+F6F8	Hungarumlautsmall	U+02DD	ignore width difference to /hungarumlaut
+U+F6F9	Lslashsmall	U+0142	ignore width difference to /lslash
+U+F6FA	OEsmall	U+0152	ignore width difference to /OE
+U+F6FB	Ogoneksmall	U+02DB	ignore width difference to /Ogonek
+U+F6FC	Ringsmall	U+02DA	ignore width difference to /ring
+U+F6FD	Scaronsmall	U+0160	ignore width difference to /Scaron
+U+F6FE	Tildesmall	U+02DC	ignore width difference to /tilde
+U+F6FF	Zcaronsmall	U+017D	ignore width difference to /Zcaron
+U+F721	exclamsmall	U+FE57	
+U+F724	dollaroldstyle	U+0024	ignore width difference to /dollar
+U+F726	ampersandsmall	U+FE60	
+U+F730	zerooldstyle	U+0030	ignore width difference to /zero
+U+F731	oneoldstyle	U+0031	
+U+F732	twooldstyle	U+0032	
+U+F733	threeoldstyle	U+0033	
+U+F734	fouroldstyle	U+0034	
+U+F735	fiveoldstyle	U+0035	
+U+F736	sixoldstyle	U+0036	
+U+F737	sevenoldstyle	U+0037	
+U+F738	eightoldstyle	U+0038	
+U+F739	nineoldstyle	U+0039	
+U+F73F	questionsmall	U+FE56	
+U+F760	Gravesmall	U+0060	ignore width difference to /grave
+U+F761	Asmall	U+0041	ignore width difference to /A (alt. IPA)
+U+F762	Bsmall	U+0042	ignore width difference to /B (alt. IPA)
+U+F763	Csmall	U+0043	ignore width difference to /C (alt. IPA)
+U+F764	Dsmall	U+0044	ignore width difference to /D (alt. IPA)
+U+F765	Esmall	U+0045	ignore width difference to /E (alt. IPA)
+U+F766	Fsmall	U+0046	ignore width difference to /F
+U+F767	Gsmall	U+0047	ignore width difference to /G
+U+F768	Hsmall	U+0048	ignore width difference to /H
+U+F769	Ismall	U+0049	ignore width difference to /I
+U+F76A	Jsmall	U+004A	ignore width difference to /J (alt. IPA)
+U+F76B	Ksmall	U+004B	ignore width difference to /K (alt. IPA)
+U+F76C	Lsmall	U+004C	ignore width difference to /L (alt. IPA)
+U+F76D	Msmall	U+004D	ignore width difference to /M (alt. IPA)
+U+F76E	Nsmall	U+004E	ignore width difference to /N
+U+F76F	Osmall	U+004F	ignore width difference to /O (alt. IPA)
+U+F770	Psmall	U+0050	ignore width difference to /P (alt. IPA)
+U+F771	Qsmall	U+0051	ignore width difference to /Q
+U+F772	Rsmall	U+0052	ignore width difference to /R
+U+F773	Ssmall	U+0053	ignore width difference to /S
+U+F774	Tsmall	U+0054	ignore width difference to /T (alt. IPA)
+U+F775	Usmall	U+0055	ignore width difference to /U (alt. IPA)
+U+F776	Vsmall	U+0056	ignore width difference to /V (alt. IPA)
+U+F777	Wsmall	U+0057	ignore width difference to /W (alt. IPA)
+U+F778	Xsmall	U+0058	ignore width difference to /X
+U+F779	Ysmall	U+0059	ignore width difference to /Y
+U+F77A	Zsmall	U+005A	ignore width difference to /Z (alt. IPA)
+U+F7A1	exclamdownsmall	U+00A1	ignore width difference to /exclamdown
+U+F7A2	centoldstyle	U+00A2	ignore width difference to /cent
+U+F7A8	Dieresissmall	U+00A8	ignore width difference to /dieresis
+U+F7AF	Macronsmall	U+00AF	ignore width difference to /macron
+U+F7B4	Acutesmall	U+00B4	ignore width difference to /acute
+U+F7B8	Cedillasmall	U+00B8	ignore width difference to /cedilla
+U+F7BF	questiondownsmall	U+00BF	ignore width difference to /questiondown
+U+F7E0	Agravesmall	U+00C0	ignore width difference to /Agrave
+U+F7E1	Aacutesmall	U+00C1	ignore width difference to /Aacute
+U+F7E2	Acircumflexsmall	U+00C2	ignore width difference to /Acircumflex
+U+F7E3	Atildesmall	U+00C3	ignore width difference to /Atilde
+U+F7E4	Adieresissmall	U+00C4	ignore width difference to /Adieresis
+U+F7E5	Aringsmall	U+00C5	ignore width difference to /Aring
+U+F7E6	AEsmall	U+00C6	ignore width difference to /AE (alt. IPA)
+U+F7E7	Ccedillasmall	U+00C7	ignore width difference to /Ccedilla
+U+F7E8	Egravesmall	U+00C8	ignore width difference to /Egrave
+U+F7E9	Eacutesmall	U+00C9	ignore width difference to /Eacute
+U+F7EA	Ecircumflexsmall	U+00CA	ignore width difference to /Ecircumflex
+U+F7EB	Edieresissmall	U+00CB	ignore width difference to /Edieresis
+U+F7EC	Igravesmall	U+00CC	ignore width difference to /Igrave
+U+F7ED	Iacutesmall	U+00ED	ignore width difference to /Iacute
+U+F7EE	Icircumflexsmall	U+00EE	ignore width difference to /Icircumflex
+U+F7EF	Idieresissmall	U+00EF	ignore width difference to /Idieresis
+U+F7F0	Ethsmall	U+00D0	ignore width difference to /Eth
+U+F7F1	Ntildesmall	U+00D1	ignore width difference to /Ntilde
+U+F7F2	Ogravesmall	U+00D2	ignore width difference to /Ograve
+U+F7F3	Oacutesmall	U+00D3	ignore width difference to /Oacute
+U+F7F4	Ocircumflexsmall	U+00D4	ignore width difference to /Ocircumflex
+U+F7F5	Otildesmall	U+00D5	ignore width difference to /Otilde
+U+F7F6	Odieresissmall	U+00D6	ignore width difference to /Odieresis
+U+F7F8	Oslashsmall	U+00D8	ignore width difference to /Oslash (alt. IPA)
+U+F7F9	Ugravesmall	U+00D9	ignore width difference to /Ugrave
+U+F7FA	Uacutesmall	U+00DA	ignore width difference to /Uacute
+U+F7FB	Ucircumflexsmall	U+00DB	ignore width difference to /Ucircumflex
+U+F7FC	Udieresissmall	U+00DC	ignore width difference to /Udieresis
+U+F7FD	Yacutesmall	U+00DD	ignore width difference to /Yacute
+U+F7FE	Thornsmall	U+00DE	ignore width difference to /Thorn
+U+F7FF	Ydieresissmall	U+0178	ignore width difference to /Ydieresis
+U+F884	maihanakatleftthai	U+0E31	ignore position difference to /maihanakatthai
+U+F885	saraileftthai	U+0E34	ignore position difference to /saraithai
+U+F886	saraiileftthai	U+0E35	ignore position difference to /saraiithai
+U+F887	saraueleftthai	U+0E36	ignore position difference to /sarauethai
+U+F888	saraueeleftthai	U+0E37	ignore position difference to /saraueethai
+U+F889	maitaikhuleftthai	U+0E42	ignore position difference to /maitaikhuthai
+U+F88A	maiekupperleftthai	U+0E48	ignore position difference to /maiekthai
+U+F88B	maieklowrightthai	U+0E48	ignore position difference to /maiekthai
+U+F88C	maieklowleftthai	U+0E48	ignore position difference to /maiekthai
+U+F88D	maithoupperleftthai	U+0E49	ignore position difference to /maithothai
+U+F88E	maitholowrightthai	U+0E49	ignore position difference to /maithothai
+U+F88F	maitholowleftthai	U+0E49	ignore position difference to /maithothai
+U+F890	maitriupperleftthai	U+0E4A	ignore position difference to /maitrithai
+U+F891	maitrilowrightthai	U+0E4A	ignore position difference to /maitrithai
+U+F892	maitrilowleftthai	U+0E4A	ignore position difference to /maitrithai
+U+F893	maichattawaupperleftthai	U+0E4B	ignore position difference to /maitrithai
+U+F894	maichattawalowrightthai	U+0E4B	ignore position difference to /maitrithai
+U+F895	maichattawalowleftthai	U+0E4B	ignore position difference to /maitrithai
+U+F896	thanthakhatupperleftthai	U+0E4C	ignore position difference to /thanthakhat
+U+F897	thanthakhatlowrightthai	U+0E4C	ignore position difference to /thanthakhat
+U+F898	thanthakhatlowleftthai	U+0E4C	ignore position difference to /thanthakhat
+U+F899	nikhahitleftthai	U+0E4D	ignore position difference to /thanthakhat
+U+F8E5	radicalex	(none)	
+U+F8E6	arrowvertex	U+23D0	
+U+F8E7	arrowhorizex	U+23AF	
+U+F8E8	registersans	U+00AE	ignore face of glyph
+U+F8E9	copyrightsans	U+00A9	ignore face of glyph
+U+F8EA	trademarksans	U+2122	ignore face of glyph
+U+F8EB	parenlefttp	(none)	
+U+F8EC	parenleftex	(none)	
+U+F8ED	parenleftbt	(none)	
+U+F8EE	bracketlefttp	(none)	
+U+F8EF	bracketleftex	(none)	
+U+F8F0	bracketleftbt	(none)	
+U+F8F1	bracelefttp	(none)	
+U+F8F2	braceleftmid	(none)	
+U+F8F3	braceleftbt	(none)	
+U+F8F4	braceex	(none)	
+U+F8F5	integralex	(none)	
+U+F8F6	parenrighttp	(none)	
+U+F8F7	parenrightex	(none)	
+U+F8F8	parenrightbt	(none)	
+U+F8F9	bracketrighttp	(none)	
+U+F8FA	bracketrightex	(none)	
+U+F8FB	bracketrightbt	(none)	
+U+F8FC	bracerighttp	(none)	
+U+F8FD	bracerightmid	(none)	
+U+F8FE	bracerightbt	(none)	
+U+F8FF	apple	(none)	

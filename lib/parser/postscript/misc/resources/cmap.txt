@@ -1,0 +1,63 @@
+/begincmap load
+{
+    /.CodeMapData [ [ [] ] [ [] ] [ [] ] ] def
+    /FontMatrices [ ] def
+    /.FontIndex   0 def
+    /.TempMaps    [ 20 dict 50 dict 50 dict ] def
+    /CodeMap      null def
+}
+
+n begincodespacerange
+{
+    pop
+    [
+}
+
+endcodespacerange
+{ 0 .appendmap }
+
+.appendmap
+{
+    .TempMaps exch get
+    counttomark 1 add 1 roll
+    ]
+}
+
+beginnotdefrange
+{
+    pop
+    [
+}
+
+endnotdefrange
+{ 2 .endmapranges }
+
+.endmapranges
+{
+    counttomark 1 add 1 roll
+    counttomark 3 idiv
+    {
+        counttomark -3 roll
+        3 1 roll
+        dup 2 index eq
+        { dup length 1 eq { 0 } { 1 } ifelse }
+        { dup length 1 sub 0
+            {
+              dup 2  index ge { exit } if
+              3 index 1 get 3 index 2 index get eq { 1 add } { exit } ifelse
+            } loop
+            exch pop
+        } ifelse
+        1 index exch 0 exch getinterval
+        dup length 3 index length exch sub dup 255 gt { $$error$$ } if
+        (\000\001\000\002) 4 string copy
+        dup 0 4 -1 roll put
+        3 -1 roll
+        dup length 3 index length
+        dup 3 1 roll
+        sub getinterval 4 -1 roll
+        dup length 4 index length
+        dup 3 1 roll 
+    }
+}
+

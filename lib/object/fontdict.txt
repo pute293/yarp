@@ -1,0 +1,59 @@
+================================================================================
+Type0
+--------------------------------------------------------------------------------
+Type            *name
+Subtype         *name
+Name            *name
+BaseFont        *name
+Encoding        *name/stream
+DescendantFonts *array
+ToUnicode       stream
+================================================================================
+
+================================================================================
+Type1, MMType1, TrueType
+--------------------------------------------------------------------------------
+Type            *name
+Subtype         *name
+Name            name
+BaseFont        *name
+FirstChar       +int
+LastChar        +int
+Width           +array
+FontDescriptor  +dict
+Encoding        name/dict
+ToUnicode       stream
+================================================================================
+
+================================================================================
+Type3
+--------------------------------------------------------------------------------
+Type            *name
+Subtype         *name
+Name            name
+FontBBox        *rect
+FontMatrix      *array
+CharProcs       *dict
+Encoding        *name/dict
+FirstChar       *int
+LastChar        *int
+Width           *array
+FontDescriptor  *dict
+Resources       dict
+ToUnicode       stream
+================================================================================
+
+================================================================================
+CIDFontType0, CIDFontType2
+--------------------------------------------------------------------------------
+Type            *name
+Subtype         *name
+BaseFont        *name
+CIDSystemInfo   *dict
+FontDescriptor  *dict
+DW              int (1000)
+W               array (none)
+DW2             array ([880 -1000])
+W2              array (none)
+CIDToGIDMap     stream/name (/Identity)
+================================================================================

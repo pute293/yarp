@@ -1,0 +1,24 @@
+---
+platform: Windows
+font-path:
+ - "%SystemRoot%\\Fonts"
+ - "%SystemRoot%\\Boot\\Fonts"
+ - "%CommonProgramFiles%"
+ - "%CommonProgramFiles(x86)%"
+---
+platform: Unix
+font-path:
+ - ~/.fonts
+ - /usr/share/fonts
+ - /usr/local/share/fonts
+---
+platform: MacOS
+font-path:
+ - ~/Library/Fonts
+ - /Library/Fonts
+ - /System/Library/Fonts
+ - /System Folder/Fonts
+---
+platform: any
+warning: null
+

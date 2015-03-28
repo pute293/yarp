@@ -1,0 +1,76 @@
+Chinese (Simplified)
+
+GB-EUC-H	CP936
+GB-EUC-V	CP936
+GBpc-EUC-H	EUC-CN
+GBpc-EUC-V	EUC-CN
+GBK-EUC-H	GBK
+GBK-EUC-V	GBK
+GBKp-EUC-H	GBK
+GBKp-EUC-V	GBK
+GBK2K-H	GB18030
+GBK2K-V	GB18030
+UniGB-UCS2-H	UCS-2BE
+UniGB-UCS2-V	UCS-2BE
+UniGB-UTF16-H	UTF-16BE
+UniGB-UTF16-V	UTF-16BE
+
+Chinese (Traditional)
+
+B5pc-H	BIG5
+B5pc-V	BIG5
+HKscs-B5-H	BIG5-HKSCS
+HKscs-B5-V	BIG5-HKSCS
+ETen-B5-H	CP950
+ETen-B5-V	Vertical version of ETen-B5-H
+ETenms-B5-H	Same as ETen-B5-H but replaces half-width Latin characters with proportional forms
+ETenms-B5-V	Vertical version of ETenms-B5-H
+CNS-EUC-H	CNS 11643-1992 character set, EUC-TW encoding
+CNS-EUC-V	Vertical version of CNS-EUC-H
+UniCNS-UCS2-H	Unicode (UCS-2) encoding for the Adobe-CNS1 character collection
+UniCNS-UCS2-V	Vertical version of UniCNS-UCS2-H
+UniCNS-UTF16-H	Unicode (UTF-16BE) encoding for the Adobe-CNS1 character collection; contains mappings for all the characters in the HKSCS-2001 character set and contains both 2- and 4-byte character codes
+UniCNS-UTF16-V	Vertical version of UniCNS-UTF16-H
+
+Japanese
+
+83pv-RKSJ-H	SHIFT_JIS
+90ms-RKSJ-H	CP932
+90ms-RKSJ-V	CP932
+90msp-RKSJ-H	CP932
+90msp-RKSJ-V	CP932
+90pv-RKSJ-H	SHIFT_JIS
+Add-RKSJ-H	SHIFT_JIS
+Add-RKSJ-V	SHIFT_JIS
+EUC-H	EUC-JP
+EUC-V	EUC-JP
+Ext-RKSJ-H	SHIFT_JIS
+Ext-RKSJ-V	SHIFT_JIS
+H	ISO-2022-JP
+V	ISO-2022-JP
+UniJIS-UCS2-H	UCS-2BE
+UniJIS-UCS2-V	UCS-2BE
+UniJIS-UCS2-HW-H	UCS-2BE
+UniJIS-UCS2-HW-V	UCS-2BE
+UniJIS-UTF16-H	UTF-16BE
+UniJIS-UTF16-V	UTF-16BE
+
+Korean
+
+KSC-EUC-H	KS X 1001:1992 character set, EUC-KR encoding
+KSC-EUC-V	Vertical version of KSC-EUC-H
+KSCms-UHC-H	Microsoft Code Page 949 (lfCharSet 0x81), KS X 1001:1992 character set plus 8822 additional hangul, Unified Hangul Code (UHC) encoding
+KSCms-UHC-V	Vertical version of KSCms−UHC-H
+KSCms-UHC-HW-H	Same as KSCms-UHC-H but replaces proportional Latin characters with half-width forms
+KSCms-UHC-HW-V	Vertical version of KSCms-UHC-HW-H
+KSCpc-EUC-H	Mac OS, KS X 1001:1992 character set with Mac OS KH extensions, Script Manager Code 3
+UniKS-UCS2-H	Unicode (UCS-2) encoding for the Adobe-Korea1 character collection
+UniKS-UCS2-V	Vertical version of UniKS-UCS2-H
+UniKS-UTF16-H	Unicode (UTF-16BE) encoding for the Adobe-Korea1 character collection
+UniKS-UTF16-V	Vertical version of UniKS-UTF16-H
+
+Generic
+
+Identity-H
+Identity-V
+
