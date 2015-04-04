@@ -5,7 +5,7 @@ require 'yarp/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "yarp"
-  spec.version       = Yarp::VERSION
+  spec.version       = YARP::VERSION
   spec.authors       = ["TODO: Write your name"]
   spec.email         = ["TODO: Write your email address"]
 
@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_development_dependency "bundler", "~> 1.8"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rake", "~> 0.9.0"
+  spec.add_development_dependency "racc", "~> 1.4.0"
   spec.add_development_dependency "rspec"
 end

@@ -101,7 +101,7 @@ module YARP::Utils::Font
       # String INDEX section
       read_index(io).each_with_index {|str,i| sid[i + 391] = str.intern}
       # Global Subr INDEX section
-      read_index(io)  # throw away
+      gsubr = read_index(io)
       
       # per-font sections
       ## CharStrings INDEX sections
@@ -153,31 +153,43 @@ module YARP::Utils::Font
           prefix = (r[0] + o[0] + o[-1].to_i.to_s).downcase
           len = Math.log10(charsets.max).to_i + 1
           dict[:Charsets] = charsets.collect{|i| "#{prefix}.#{i.to_s.rjust(len,'0')}".intern}.freeze
-          ## ignore information for rasterization
-          #cid = dict#[:CID]
-          #io.seek(cid[:FDSelect])
-          #fmt = io.read(1).ord
-          #fdselect = case fmt # cid => index of font dict
-          #when 0
-          #  io.read(dict[:nGlyphs]).unpack('C*')
-          #when 3
-          #  num_ranges, = io.read(2).unpack('n')
-          #  ranges = io.read(3 * num_ranges).unpack('nC' * num_ranges)
-          #  sentinel, = io.read(2).unpack('n')
-          #  ranges.push(sentinel, -1)
-          #  hash = {}
-          #  ranges.each_slice(2).each_cons(2) do |r1, r2|
-          #    fst = r1[0]
-          #    fd_idx = r1[1]
-          #    fst.upto(r2[0] - 1) {|gid| hash[gid] = fd_idx}
-          #  end
-          #  hash
-          #else raise InvalidFontFormat, "invalid FDSelect format #{fmt}; expected 0, 3"
-          #end
-          #io.seek(cid[:FDArray])
-          #fdarray = read_index(io).collect{|str| read_dict(str)}
-          #dict[:fdselect] = fdselect
-          #dict[:fdarray] = fdarray.collect{|fd| if fd[:Private];io.seek(fd[:Private][1]);fd[:Private] = read_dict(io.read(fd[:Private][0]));end;fd}
+          
+          next if (dict[:FDArray].nil? && dict[:FDSelect].nil?)
+          
+          # fdarray: Array of FontDict which consist of sid of FontName (or other string values) and PrivateDict operator
+          io.seek(dict[:FDArray])
+          fdarray = read_index(io).collect{|str| read_dict(str, sid)}
+          fdarray.each do |fd|
+            if fd[:Private]
+              size, off = fd[:Private]
+              pdict = read_private_dict(io, sid, size, off)
+              fd[:Private] = pdict.freeze
+            end
+          end
+          
+          # fdselect: cid => index of FontDict
+          io.seek(dict[:FDSelect])
+          fdselect = case fmt = io.read(1).ord
+          when 0
+            io.read(dict[:nGlyphs]).unpack('C*')
+          when 3
+            num_ranges, = io.read(2).unpack('n')
+            ranges = io.read(3 * num_ranges).unpack('nC' * num_ranges)
+            sentinel, = io.read(2).unpack('n')
+            ranges.push(sentinel, -1)
+            hash = Hash.new {|h, key| key = h.keys.find{|r| r.include?(key)} if key.kind_of?(Numeric); h.fetch(key)}
+            ranges.each_slice(2).each_cons(2) do |r1, r2|
+              fst = r1[0]
+              fd_idx = r1[1]
+              #fst.upto(r2[0] - 1) {|gid| hash[gid] = fd_idx}
+              hash[(fst..r2[0]-1)] = fd_idx
+            end
+            hash
+          else raise InvalidFontFormat, "invalid FDSelect format #{fmt}; expected 0, 3"
+          end
+          
+          dict[:FDArray] = fdarray.freeze
+          dict[:FDSelect] = fdselect.freeze
         end
       end
       ## Encodings sections
@@ -211,8 +223,17 @@ module YARP::Utils::Font
         end
         dict[:Encoding] = encoding.freeze
       end
-      fonts.each {|font,dict| dict.freeze}
+      ## PrivateDict sections
+      fonts.each do |font, dict|
+        next unless dict.has_key?(:Private)
+        size, off = dict[:Private]
+        pdict = read_private_dict(io, sid, size, off)
+        dict[:Private] = pdict.freeze
+      end
+      
+      fonts.each {|font,dict| dict.delete(:_charset) if dict.has_key?(:_charset); dict.freeze}
       fonts[:SID] = sid.freeze
+      fonts[:Gsubr] = gsubr.freeze
       fonts
     end
     
@@ -250,7 +271,7 @@ module YARP::Utils::Font
     DictOperators.default = :_reserved_
     DictOperators.freeze
     
-    def read_dict(str)
+    def read_dict(str, sid={})
       io = StringIO.new(str, 'rb:ASCII-8BIT')
       dict = {}
       operand_stack = []
@@ -262,7 +283,11 @@ module YARP::Utils::Font
           b0 = ((b0 << 8) | io.read(1).unpack('C')[0]) if b0 == 12
           op = DictOperators[b0]
           raise InvalidCffFormat, "invalid DICT operator 0x#{b0.to_s(16)}" if op == :_reserved_
-          dict[op] = operand_stack.size <= 1 ? operand_stack.first : operand_stack.freeze
+          val = operand_stack.size <= 1 ? operand_stack.first : operand_stack.freeze
+          if !sid.empty? && %i{ version Notice CopyRight FullName FamilyName Weight PostScript BaseFontName FontName }.include?(op)
+            val = sid.fetch(val)
+          end
+          dict[op] = val
           operand_stack = []
           next
         when 28
@@ -304,6 +329,19 @@ module YARP::Utils::Font
       dict
     end
     
+    def read_private_dict(io, sid={}, size=nil, offset=nil)
+      return nil if (size.nil? || offset.nil?)
+      io.seek(offset)
+      pdict = init_private_dict(read_dict(io.read(size), sid))
+      subr_off = pdict[:Subrs]
+      if subr_off
+        io.seek(offset + subr_off)
+        subr = read_index(io)
+        pdict[:Subrs] = subr.freeze
+      end
+      pdict
+    end
+    
     def init_top_dict(dict)
         # initialize dict
         dict[:isFixedPitch] ||= 0
@@ -323,6 +361,20 @@ module YARP::Utils::Font
           dict[:CIDFontType] ||= 0
           dict[:CIDCount] ||= 8720
         end
+        dict
+    end
+    
+    def init_private_dict(dict)
+        # initialize dict
+        dict[:BlueScale] ||= 0.039625
+        dict[:BlueShift] ||= 7
+        dict[:BlueFuzz] ||= 1
+        dict[:ForceBold] ||= false
+        dict[:LanguageGroup] ||= 0
+        dict[:ExpansionFactor] ||= 0.06
+        dict[:initialRandomSeed] ||= 0
+        dict[:defaultWidthX] ||= 0
+        dict[:nominalWidthX] ||= 0
         dict
     end
   end

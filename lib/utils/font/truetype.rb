@@ -2,6 +2,8 @@ module YARP::Utils::Font
   
   class TrueType < FontBase
     
+    attr_reader :xmin, :ymin, :xmax, :ymax
+    
     def get_cmaps
       return @cmaps if @cmaps
       cmap = @tables[:cmap]
@@ -57,9 +59,50 @@ module YARP::Utils::Font
       gids_array.size <= 1 ? result.first : result
     end
     
-    #def [](name)
-    #  @tables[name.intern]
-    #end
+    # return { :aw => advance_width, :lsb => left_side_bearing }
+    def get_hmetrics(gid)
+      return nil if glyphcount <= gid
+      @hhea ||= self[:hhea]
+      hmtx = self[:hmtx]
+      return nil if (@hhea.nil? || hmtx.nil?)
+      num_hmtx = @hhea[:num_hmtx]
+      if gid < num_hmtx
+        off = gid * 4
+        aw, lsb = hmtx[off, 4].unpack('n2').pack('ns').unpack('ns')
+      else
+        aw, = hmtx[(num_hmtx - 1) * 4, 2].unpack('n')
+        lsb, = hmtx[(num_hmtx * 4) + (gid - num_hmtx) * 2, 2].unpack('n').pack('s').unpack('s')
+      end
+      { :aw => aw, :lsb => lsb }
+    end
+    
+    # return { :ah => advance_height, :tsb => top_side_bearing }
+    def get_vmetrics(gid)
+      return nil if glyphcount <= gid
+      @vhea ||= self[:vhea]
+      vmtx = self[:vmtx]
+      return nil if (@vhea.nil? || vmtx.nil?)
+      num_vmtx = @vhea[:num_vmtx]
+      if gid < num_vmtx
+        off = gid * 4
+        ah, tsb = vmtx[off, 4].unpack('n2').pack('ns').unpack('ns')
+      else
+        ah, = vmtx[(num_vmtx - 1) * 4, 2].unpack('n')
+        tsb, = vmtx[(num_vmtx * 4) + (gid - num_vmtx) * 2, 2].unpack('n').pack('s').unpack('s')
+      end
+      { :ah => ah, :tsb => tsb }
+    end
+    
+    def [](name)
+      table = @tables[name.intern]
+      if table.nil?
+        nil
+      elsif table.respond_to?(:read)
+        table.read(@io)
+      else
+        table.dump(@io)
+      end
+    end
     
     def initialize(*args)
       super
@@ -107,6 +150,8 @@ module YARP::Utils::Font
         end
       }.flatten.uniq
       
+      io.seek(head.offset + 36)
+      @xmin, @ymin, @xmax, @ymax = io.read(8).unpack('n4').pack('s4').unpack('s4')
       io.seek(head.offset + 50)
       @loca_fmt = io.us
       unless [0, 1].include?(@loca_fmt)
@@ -162,53 +207,8 @@ module YARP::Utils::Font
       end
     end
     
-    
-    class Table
-      attr_reader :tag, :checksum, :offset, :length
-      alias :pos :offset
-      alias :size :length
-      
-      def initialize(tag, checksum, offset, length)
-        @tag, @checksum, @offset, @length = tag.intern, checksum, offset, length
-      end
-      
-      def dump(io)
-        io.seek(offset)
-        io.read(length)
-      end
-      
-      def to_s; "#{@tag}##{'%08x'%@offset}/#{'%08x'%@length}" end
-      
-      def inspect
-        s = super
-        s.sub(/@(checksum|offset|length)=(\d+)/) {"@#{$1}=#{'%08x'%$2}"}
-      end
-      
-      private
-      def warn(*args)
-        YARP.warn(*args)
-      end
-      
-      class << self
-        alias :new_old :new
-        def new(tag, *args)
-          tag = tag.intern
-          klass = case tag
-          when :cmap then Cmap
-          when :name then Name
-          when :GSUB then Gsub
-          else Table
-          end
-          klass.new_old(tag, *args)
-        end
-      end
-    end
-    
   end
   
 end
 
-require_relative 'truetypetable/constants'
-require_relative 'truetypetable/cmap'
-require_relative 'truetypetable/name'
-require_relative 'truetypetable/gsub'
+require_relative 'truetypetable/table'
