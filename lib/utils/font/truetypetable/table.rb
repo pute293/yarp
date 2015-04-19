@@ -37,6 +37,7 @@ class TrueType
       def new(tag, *args)
         tag = tag.intern
         klass = case tag
+        when :head then Head
         when :cmap then Cmap
         when :name then Name
         when :hhea then Hhea
@@ -56,6 +57,7 @@ end
 end
 
 require_relative 'constants'
+require_relative 'head'
 require_relative 'cmap'
 require_relative 'name'
 require_relative 'hhea'

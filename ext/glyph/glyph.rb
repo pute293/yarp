@@ -4,7 +4,7 @@ class Glyph
     
     alias :newobj :new
     
-    def new(font, gid, cmaps, gpos)
+    def new(font, gid, cmaps=nil, gpos=nil)
       raise ArgumentError, 'unknown type of font' unless font.respond_to?(:type)
       case font.type
       when :TrueType
@@ -25,11 +25,11 @@ class Glyph
   
   def bsb; ah - (tsb + ymax - ymin) end
   
-  def valid?; @data && !@data.empty? end
+  def valid?; !!@data && !@data.empty? end
   
   def composite?; false end
   
-  def initialize(font, gid, cmaps, gpos)
+  def initialize(font, gid, cmaps=nil, gpos=nil)
     @font = font
     @gid = gid
     @data = font.glyph_data(gid)
@@ -45,119 +45,96 @@ class Glyph
     @eoc = []
     @insts = ''
     
-    unicode = cmaps.inject(0) do |uni, cmap|
-      if cmap.format == 14
-        unis = cmap.code2gid.key(gid)
-        break unis.unpack('N*') if unis
-        uni
-      else
-        fmt = case cmap.bytes
-        when 1 then 'C'
-        when 2 then 'n'
-        when 4 then 'N'
-        else raise 'must not happen'
+    if cmaps
+      unicode = cmaps.inject(0) do |uni, cmap|
+        if cmap.format == 14
+          unis = cmap.code2gid.key(gid)
+          break unis.unpack('N*') if unis
+          uni
+        else
+          fmt = case cmap.bytes
+          when 1 then 'C'
+          when 2 then 'n'
+          when 4 then 'N'
+          else raise 'must not happen'
+          end
+          u = cmap.code2gid.reverse_each.find{|code, v| break code if v == gid}
+          if u
+            u, = u.unpack(fmt)
+            uni < u ? u : uni
+          else uni
+          end
+          #u = cmap.code2gid.keys(gid).collect{|key| key.unpack(fmt)[0]}.max
         end
-        u = cmap.code2gid.reverse_each.find{|code, v| break code if v == gid}
-        if u
-          u, = u.unpack(fmt)
-          uni < u ? u : uni
-        else uni
-        end
-        #u = cmap.code2gid.keys(gid).collect{|key| key.unpack(fmt)[0]}.max
       end
+      @uni = unicode.kind_of?(Array) ? unicode : unicode == 0xffff ? nil : [unicode]
+    else
+      @uni = nil
     end
-    @uni = unicode.kind_of?(Array) ? unicode : unicode == 0xffff ? nil : [unicode]
     
-    #lookups = gpos[2]
-    #p gpos[2].flatten.size
-    #pp gpos
-    @features = []
-    @anchors = []
-    gpos[2].each_with_index do |hashs, i|
-      if hashs.find {|hash| hash[:coverages].include?(gid)}
-        fts = gpos[1].select{|ft| ft[:lookup_indices].include?(i)}
-        fs = fts.collect.with_index{|ft, i| [ft[:tag], i]}
-        next unless fs
-        #gpos[0].each do |script|
-        #  strs = script[:langs].collect {|lang|
-        #    f = fs.find{|ft| lang[:feature_indices].include?(ft[1])}
-        #    tag = lang[:tag] == :DFLT ? script[:tag] : lang[:tag]
-        #    f ? [tag, *f] : nil
-        #  }.compact.collect{|lang| "#{lang[0]}/#{lang[1]}"}
-        #  @features.push(*strs)
-        #end
-        fs = fs.collect(&:first)
-        @features.push(*fs)
-        
-        # add anchors
-        fts.each do |ft|
-          next unless %i{ mark mkmk curs }.include?(ft[:tag])
-          ft[:lookup_indices].each do |lk_idx|
-            lookups = gpos[2][lk_idx].select{|lk| lk[:coverages].include?(gid)}
-            until lookups.empty?
-            #lookups.each do |lookup|
-              lookup = lookups.pop
-              next unless values = lookup[:values]
-              
-              case subtype = lookup[:subtype]
-              when :single_adjust, :pair_adjust # do nothing
-              when :base, :mark
-                @anchors.push(*values.collect{|klass, (x, y)| ["#{lk_idx}:#{subtype}", x, y]})
-              when :cursive
-                idx = lookup[:coverages].index(gid)
-                ent, exi = values.fetch(idx).values_at(:entry, :exit)
-                @anchors.push(["#{lk_idx}:entry", *ent]) if ent
-                @anchors.push(["#{lk_idx}:exit", *exi]) if exi
-              when :ligature
-                idx = lookup[:coverages].index(gid)
-                pts = values.fetch(idx)
-                pts.each do |pts_lig|
-                  @anchors.push(*pts_lig.collect{|klass, (x, y)| ["#{lk_idx}:#{subtype}", x, y]})
+    if gpos
+      @features = []
+      @anchors = []
+      gpos[2].each_with_index do |hashs, i|
+        if hashs.find {|hash| hash[:coverages].include?(gid)}
+          fts = gpos[1].select{|ft| ft[:lookup_indices].include?(i)}
+          fs = fts.collect.with_index{|ft, i| [ft[:tag], i]}
+          next unless fs
+          #gpos[0].each do |script|
+          #  strs = script[:langs].collect {|lang|
+          #    f = fs.find{|ft| lang[:feature_indices].include?(ft[1])}
+          #    tag = lang[:tag] == :DFLT ? script[:tag] : lang[:tag]
+          #    f ? [tag, *f] : nil
+          #  }.compact.collect{|lang| "#{lang[0]}/#{lang[1]}"}
+          #  @features.push(*strs)
+          #end
+          fs = fs.collect(&:first)
+          @features.push(*fs)
+          
+          # add anchors
+          fts.each do |ft|
+            next unless %i{ mark mkmk curs }.include?(ft[:tag])
+            ft[:lookup_indices].each do |lk_idx|
+              lookups = gpos[2][lk_idx].select{|lk| lk[:coverages].include?(gid)}
+              until lookups.empty?
+              #lookups.each do |lookup|
+                lookup = lookups.pop
+                next unless values = lookup[:values]
+                
+                case subtype = lookup[:subtype]
+                when :single_adjust, :pair_adjust # do nothing
+                when :base, :mark
+                  @anchors.push(*values.collect{|klass, (x, y)| ["#{lk_idx}:#{subtype}", x, y]})
+                when :cursive
+                  idx = lookup[:coverages].index(gid)
+                  ent, exi = values.fetch(idx).values_at(:entry, :exit)
+                  @anchors.push(["#{lk_idx}:entry", *ent]) if ent
+                  @anchors.push(["#{lk_idx}:exit", *exi]) if exi
+                when :ligature
+                  idx = lookup[:coverages].index(gid)
+                  pts = values.fetch(idx)
+                  pts.each do |pts_lig|
+                    @anchors.push(*pts_lig.collect{|klass, (x, y)| ["#{lk_idx}:#{subtype}", x, y]})
+                  end
+                when :context
+                  idx = lookup[:coverages].index(gid)
+                  entry = values.find{|val| val[0] == idx}
+                  next unless entry
+                  lks = gpos[2][entry[1]]
+                  lk = lks.find{|lk| lk[:coverages].include?(gid)}
+                  lookups.push(lk) if lk
                 end
-              when :context
-                idx = lookup[:coverages].index(gid)
-                entry = values.find{|val| val[0] == idx}
-                next unless entry
-                lks = gpos[2][entry[1]]
-                lk = lks.find{|lk| lk[:coverages].include?(gid)}
-                lookups.push(lk) if lk
               end
             end
           end
-          #lookups = gpos[2].values_at(*ft[:lookup_indices]).collect{|lookups| lookups.select{|lk| lk[:type] == :GPOS && lk[:coverages].include?(gid)}}.flatten(1)
-          #lookups.each do |lookup|
-          #  next unless values = lookup[:values]
-          #  #idx = lookup[:coverages].index(gid)
-          #  #pts = lookup[:values].fetch(idx)
-          #  lk_idx = gpos[2].index(lookup)
-          #  case subtype = lookup[:subtype]
-          #  when :single_adjust, :pair_adjust # do nothing
-          #  when :base, :mark
-          #    @anchors.push(*values.collect{|klass, (x, y)| ["#{lk_idx}:#{subtype}", x, y]})
-          #  when :ligature
-          #    idx = lookup[:coverages].index(gid)
-          #    pts = lookup[:values].fetch(idx)
-          #    pts.each do |pts_lig|
-          #      @anchors.push(*pts_lig.collect{|klass, (x, y)| ["#{lk_idx}:#{subtype}", x, y]})
-          #    end
-          #    #pp pts
-          #    #@anchors.push(*pts.collect{|klass, (x, y)| ["#{klass}:#{subtype}", x, y]})
-          #  end
-          #end
-          #pts = pts.select{|obj| obj.kind_of?(Array) && obj.size == 2}
-          #@anchors.push(*pts.collect do |klass, (x, y)|
-          #  klass = case ft[:tag]
-          #  when :mark then "#{klass}:base"
-          #  when :mkmk then "#{klass}:mark"
-          #  else ''
-          #  end
-          #  [klass, x, y]
-          #end)
         end
       end
+      @features.uniq!
+      @anchors.uniq!
+    else
+      @features = nil
+      @anchors = []
     end
-    @features.uniq!
-    @anchors.uniq!
     #pp @anchors
   end
   

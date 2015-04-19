@@ -2,8 +2,6 @@ module YARP::Utils::Font
   
   class TrueType < FontBase
     
-    attr_reader :xmin, :ymin, :xmax, :ymax
-    
     def get_cmaps
       return @cmaps if @cmaps
       cmap = @tables[:cmap]

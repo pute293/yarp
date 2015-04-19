@@ -35,10 +35,10 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
   
   font = glyph.font
   xmin, xmax, ymin, ymax = %i{ xmin xmax ymin ymax }.collect{|sym| font.send(sym)}
-  gw = xmax - xmin
-  gh = ymax - ymin
-  g = [gw, gh].max.to_f
-  r = w / g * $scale.to_f
+  fw = xmax - xmin
+  fh = ymax - ymin
+  fs = [fw, fh].max.to_f
+  r = w / fs * $scale.to_f
   mx, my = $margin_x, $margin_y
   
   gxmin, gxmax, gymin, gymax = %i{ xmin xmax ymin ymax }.collect{|sym| glyph.send(sym)}
@@ -55,6 +55,18 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
     window.draw(bbox0[2], 0, bbox0_h_dotline)
     window.draw(0, bbox0[3], bbox0_v_dotline)
     window.draw_box_fill(*bbox, [255, 200, 200])
+    
+    if hhea = font[:hhea]
+      ascender = hhea[:ascender]; ash = h - ascender * r - my
+      descender = hhea[:descender]; dsh = h - descender * r - my
+      hhea_h_dotline = Image.create_from_array(w, 1, ([[255, 0, 0, 255], [0, 0, 0, 0]] * (w / 2)).flatten(1))
+      window.draw(0, ash, hhea_h_dotline)
+      window.draw(0, dsh, hhea_h_dotline)
+      dx = $font_small.get_width("ascender=#{ascender}")
+      window.draw_font_ex(w - dx - 5, ash,  "ascender=#{ascender}", $font_small, color: [0,0,255])
+      dx = $font_small.get_width("descender=#{descender}")
+      window.draw_font_ex(w - dx - 5, dsh - 11,  "descender=#{descender}", $font_small, color: [0,0,255])
+    end
   end
   
   # axes
@@ -68,13 +80,13 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
     # horizontal
     aw, lsb = glyph.aw, glyph.lsb
     h_dotline = Image.create_from_array(1, h, ([[128, 255, 0, 0], [0, 0, 0, 0]] * (h / 2)).flatten(1))
-    aw_x, lsb_x = [aw, lsb].collect{|w| w * r - 3 + mx}
+    aw_x, lsb_x = [aw, lsb].collect{|w| w * r + mx}
     aw_y = lsb_y = h - origin[1] - my - 3
     window.draw(aw_x, 0, h_dotline)
-    window.draw_font_ex(aw_x + 5, h - 12,  "aw=#{aw}", $font_small, color: [0,0,0])
+    window.draw_font_ex(aw_x + 5, h - 12,  "aw=#{aw}", $font_small, color: [255,0,0])
     window.draw(lsb_x, 0, h_dotline)
     lsb_w = $font_small.get_width("lsb=#{lsb}")
-    window.draw_font_ex(lsb_x - lsb_w - 3, h - 12,  "lsb=#{lsb}", $font_small, color: [0,0,0])
+    window.draw_font_ex(lsb_x - lsb_w - 3, h - 12,  "lsb=#{lsb}", $font_small, color: [255,0,0])
     
     # vertical
     ah, tsb = glyph.ah, glyph.tsb
@@ -99,7 +111,7 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
   # glyph
   points = glyph.coordinates.collect{|x, y, on| [x * r, y * r, on]}
   first_idx = 0
-  on_box = Image.new(5, 5); on_box.fill([0, 0, 255])
+  on_box = Image.new(6, 6); on_box.circle_fill(3, 3, 3, [0, 0, 255])
   off_box = Image.new(6, 6); #off_box.box(0, 0, 5, 5, [255, 0, 0])
   off_box.line(0, 0, 5, 5, [255, 0, 0]); off_box.line(0, 5, 5, 0, [255, 0, 0])
   glyph.eoc.each do |idx|
@@ -107,6 +119,9 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
     pts[0][2] = true
     
     if aa
+      pt_idx = first_idx
+      dummy_box = Image.new(6, 6); dummy_box.circle_fill(3, 3, 3, [255, 0, 0])
+      
       from = pts.shift
       real_knot = from[2]
       until pts.empty?
@@ -114,7 +129,15 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
         x0, y0 = real_knot ? [from[0] + mx, h - from[1] - my] : from
         x1, y1 = to[0] + mx, h - to[1] - my
         
-        window.draw(x0 - 2, y0 - 2, on_box) if show_point && real_knot
+        if show_point
+          if real_knot
+            window.draw(x0 - 2, y0 - 2, on_box)
+            window.draw_font_ex(x0 + 2, y0 + 2, pt_idx.to_s, $font_small, color: [0,0,255])
+            pt_idx += 1
+          else
+            window.draw_alpha(x0 - 2, y0 - 2, dummy_box, 128)
+          end
+        end
         
         if to[2]
           # straigh line
@@ -129,7 +152,12 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
           y2 = h - to[1] - my
           if $bezier
             # 3-order bezier curve
-            window.draw(x2 - 3, y2 - 3, off_box) if show_point
+            if show_point
+              window.draw(x2 - 3, y2 - 3, off_box)
+              window.draw_font_ex(x1 + 2, y1 + 2, pt_idx.to_s, $font_small, color: [255,0,0])
+              window.draw_font_ex(x2 + 2, y2 + 2, (pt_idx + 1).to_s, $font_small, color: [255,0,0])
+              pt_idx += 2
+            end
             to = pts.shift
             x3 = to[0] + mx
             y3 = h - to[1] - my
@@ -137,11 +165,19 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
             from = to
             real_knot = true
           elsif to[2]
+            if show_point
+              window.draw_font_ex(x1 + 2, y1 + 2, pt_idx.to_s, $font_small, color: [255,0,0])
+              pt_idx += 1
+            end
             window.draw_spline2(x0, y0, x1, y1, x2, y2, [0, 0, 0])
             from = to
             real_knot = true
           else
             # center of [x1, y1] and [x2, y2] is temporary knot point
+            if show_point
+              window.draw_font_ex(x1 + 2, y1 + 2, pt_idx.to_s, $font_small, color: [255,0,0])
+              pt_idx += 1
+            end
             pts.unshift(to)
             x2, y2 = [(x1 + x2) / 2, (y1 + y2) / 2]
             window.draw_spline2(x0, y0, x1, y1, x2, y2, [0, 0, 0])
@@ -151,11 +187,20 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
         end
       end
     else
+      pt_idx = first_idx
       pts.each_cons(2) do |from, to|
         x0, y0 = from[0] + mx, h - from[1] - my
         x1, y1 = to[0] + mx, h - to[1] - my
         if show_point
-          from[2] ? window.draw(x0 - 2, y0 - 2, on_box) : window.draw(x0 - 3, y0 - 3, off_box)
+          if from[2]
+            window.draw(x0 - 2, y0 - 2, on_box)
+            pt_color = [0, 0, 255]
+          else
+            window.draw(x0 - 3, y0 - 3, off_box)
+            pt_color = [255, 0, 0]
+          end
+          window.draw_font_ex(x0 + 2, y0 + 2, pt_idx.to_s, $font_small, color: pt_color)
+          pt_idx += 1
         end
         window.draw_line(x0, y0, x1, y1, [0, 0, 0])
       end
@@ -196,7 +241,9 @@ def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
   window.draw_font_ex(5, y, "(#{mouse_x.round(3)}, #{mouse_y.round(3)})", $font, color: [0,0,0]); y += s
   window.draw_font_ex(5, y, 'Features:', $font, color: [0,0,0]); y += s
   features = glyph.features
-  if features.empty?
+  if features.nil?
+    # do nothing
+  elsif features.empty?
     window.draw_font_ex(21, y, '(none)', $font, color: [0,0,0]); y += s
   else
     features.each {|ft| window.draw_font_ex(21, y, "<#{ft}>", $font, color: [0,0,0]); y += s}

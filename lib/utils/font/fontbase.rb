@@ -3,6 +3,7 @@ module YARP::Utils::Font
   class FontBase
     attr_accessor :embedded
     attr_reader :type, :fullname, :familyname, :glyphcount
+    attr_reader :xmin, :ymin, :xmax, :ymax
     
     def get_cmaps; raise NotImplementedError, 'must be overrided' end
     def gid2name(*gids); raise NotImplementedError, 'must be overrided' end
@@ -60,6 +61,7 @@ module YARP::Utils::Font
     
     def initialize(io, *args)
       @fullname, @familyname, @glyphcount = [], [], 0
+      @xmin, @ymin, @xmax, @ymax = nil, nil, nil, nil
       @io = io.extend(ExtendIO)
     end
     
