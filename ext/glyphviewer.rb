@@ -8,20 +8,6 @@ require_relative 'glyph/glyph'
 $bar = '-' * 80
 $barb = '=' * 80
 
-class Integer
-  def to_f2dot14
-    raise TypeError, 'overflow' unless (0..0xffff).include?(self)
-    mantissa = case self >> 14
-      when 0 then 0
-      when 1 then 1
-      when 2 then -2
-      when 3 then -1
-    end
-    frac = Rational(self & 0b0011_1111_1111_1111, 16384)  # 16384 == 0b0100_0000_0000_0000
-    (mantissa + (mantissa < 0 ? -frac : frac)).to_f
-  end
-end
-
 def show_glyph(window, glyph, show_box, show_point, show_metrics, aa)
   window.caption = "#{glyph.font.fullname.first} / #{glyph.gid}"
   unless glyph.valid?

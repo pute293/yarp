@@ -1,171 +1,75 @@
 #! ruby
 
 require 'pp'
+require 'zlib'
 require 'narray'
 require_relative '../lib/yarp'
 require_relative 'glyph/glyph'
 
+raise 'released version of narray needed' if '0.7' <= NArray::NARRAY_VERSION
 
-class Mat64 < Array
+class NArray
   
-  VEC_SIZE = 8
-  
-  attr_reader :matrix
-  
-  def initialize(lazy=false)
-    #super(64){ NVector.float(VEC_SIZE) }
-    lazy ? super(64, nil) : super(64){ NArray.float(VEC_SIZE) }
-    #super(64){ NArray.float(VEC_SIZE) }
-    #super(64){ Array.new(VEC_SIZE, 0) }
-    #64.times{|i| self[i][true] = Float::NAN}
+  def _dump(limit)
+    Marshal.dump(
+      { :version => NArray::NARRAY_VERSION,
+        :endian => NArray::ENDIAN,
+        :typecode => self.typecode,
+        :shape => self.shape,
+        :data => self.to_s }
+    )
   end
   
-  #def *(other)
-  #  raise TypeError unless other.kind_of?(self.class)
-  #  mat = self.class.new
-  #  #zero_vec = NVector.float(VEC_SIZE)
-  #  #64.times {|i| mat[i] = self[i] * other[i]}
-  #  64.times do |i|
-  #    #mat[i] = self[i].zip(other[i]).collect{|a, b| a == 0.0 ? (-b * 0.01) : b == 0.0 ? (-a * 0.01) : a * b}.inject(&:+)
-  #    mat[i] = self[i].zip(other[i]).collect{|a, b| a * b}.inject(&:+)
-  #  end
-  #  mat
-  #end
-  
-  def dot(other, penalty)
-    raise TypeError unless other.kind_of?(self.class)
-    mat = self.class.new(true)
-    if penalty.zero?
-      64.times {|i| mat[i] = (self[i] * other[i]).sum}
-    else
-      64.times do |i|
-        pen1 = self[i].eq(0.0) * other[i]
-        pen2 = other[i].eq(0.0) * self[i]
-        penalty_vector = (pen1 + pen2) * (-penalty)
-        mat[i] = (self[i] * other[i] + penalty_vector).sum
-        #mat[i] = self[i].zip(other[i]).collect{|a, b| a == 0.0 ? (-b * penalty) : b == 0.0 ? (-a * penalty) : a * b}.inject(&:+)
-      end
-    end
-    mat
-  end
-  
-  #GAUSIAN = NMatrix[
-  #  [1.0/256,  4.0/256,  6.0/256,  4.0/256, 1.0/256],
-  #  [4.0/256, 16.0/256, 24.0/256, 16.0/256, 4.0/256],
-  #  [6.0/256, 24.0/256, 36.0/256, 24.0/256, 6.0/256],
-  #  [4.0/256, 16.0/256, 24.0/256, 16.0/256, 4.0/256],
-  #  [1.0/256,  4.0/256,  6.0/256,  4.0/256, 1.0/256],
-  #]
-  
-  def gaussian!(sigma1=0.8, sigma2=0.5, size=3)
-    size = size.to_i
-    size -= 1 if size.odd?
-    size /= 2
-    ss = sigma1.to_f * sigma1
-    ss2 = sigma2.to_f * sigma2
-    cf = 1.0 / Math.sqrt(2 * Math::PI * ss)
-    cf2 = 1.0 / (2 * Math::PI * ss2)
-    g = {}; g2 = {}
-    gauss = Proc.new{|d| g[d] ? g[d] : (g[d] = cf * Math.exp(-d * d/(2 * ss)))}
-    gauss2 = Proc.new{|di, dj| g2[[di,dj]] ? g2[[di,dj]] : (g2[[di,dj]] = cf2 * Math.exp(-(di * di + dj * dj)/(2 * ss2)))}
-    
-    vectors = self.collect.with_index do |vec, i|
-      #vec
-      next vec if vec.eq(0.0).all?
-      s0 = (vec * vec).sum
-      vec0 = NArray.float(VEC_SIZE)
-      (-size..size).each do |di| (-size..size).each do |dj|
-        d0 = (i % 8) + di; d1 = i + dj * 8
-        next if (d0 < 0 || 7 < d0)
-        next if (d1 < 0 || 63 < d1)
-        vec0 += self[i + di + dj * 8] * gauss2.call(di, dj)
-      end end
-      s1 = (vec0 * vec0).sum
-      s1 == 0.0 ? vec0 : (vec0 / s1 * s0)
-    end
-    
-    #63.times{|i|self[i] = vectors[i]}
-    
-    self.collect!.with_index do |_, i|
-      vec = vectors[i]
-      next vec if vec.eq(0.0).all?
-      s0 = (vec * vec).sum
-      vec0 = NArray.float(VEC_SIZE + size * 2)
-      VEC_SIZE.times do |i|
-        v = vec[i]
-        next if v == 0.0
-        (-size..size).each {|d| vec0[i + size + d] += v * gauss.call(d)}
-        #vec0[i - 2] += v * 0.06
-        #vec0[i - 1] += v * 0.24
-        #vec0[i    ] += v * 0.4
-        #vec0[i + 1] += v * 0.24
-        #vec0[i + 2] += v * 0.06
-      end
-      vec0 = vec0[size..-size-1]
-      s1 = (vec0 * vec0).sum
-      s1 == 0.0 ? vec0 : (vec0 / s1 * s0)
-    end
-  end
-  
-  def self.create_gaussian_kernel(sigma=1.0, size=5)
-    raise TypeError, 'size must be odd integer' unless (size.kind_of?(Fixnum) && size.odd?)
-    g = NMatrix.float(size, size)
-    sigma = sigma.to_f
-    ss = sigma * sigma
-    center = (size - 1) / 2
-    cf = 1.0 / (2 * Math::PI * ss)
-    sum = 0.0
-    size.times do |i| size.times do |j|
-      x = i - center; y = j - center
-      sum += g[i,j] = cf * Math.exp(-(x * x + y * y) / (2 * ss))
-    end end
-    g / sum
-  end
-  
-  def marshal_dump
-    self.collect{|vec| vec.to_a}
-  end
-  
-  def marshal_load(obj)
-    #64.times {|i| self[i] = NVector.to_na(obj.fetch(i))}
-    64.times {|i| self[i] = NArray.to_na(obj.fetch(i))}
-    #64.times {|i| self[i] = obj.fetch(i))}
+  def self._load(str)
+    obj = Marshal.load(str)
+    raise TypeError, 'narray version conflicted' if obj.fetch(:version) != NArray::NARRAY_VERSION
+    na = NArray.to_na(obj.fetch(:data), obj.fetch(:typecode), *obj.fetch(:shape))
+    obj.fetch(:endian) == NArray::ENDIAN ? na : na.swap_byte
   end
   
 end
 
-#class Learner
-#  
-#  def self.create_matrix_ft_vector(mat1, mat2)
-#    
-#    
-#    
-#  end
-#  
-#end
+#pp open('arial.vec', 'rb:ASCII-8BIT'){|io| Marshal.load(io.read)}
+#exit
 
-class GlyphMetrics
+if ARGV.empty?
+  $stdout.sync = true
+  arial = open('./vec/arial.vec', 'rb:ASCII-8BIT'){|io| Marshal.load(Zlib::Inflate.inflate(io.read))}
+  io = open('arial2.txt', 'w:ASCII-8BIT')
   
-  attr_reader :fontname, :unicode, :gid, :matrix
-  
-  def initialize(fontname, unicode, gid, matrix)
-    @fontname = fontname
-    @unicode = unicode
-    @gid = gid
-    @matrix = matrix
+  codes = [(0x20..0xd7ff), (0xf900..0xfffd)].collect(&:to_a).flatten
+  #io.puts(['U+', *codes].join(','))
+  arial.zip(codes).each do |vec1, u|
+    puts u.to_s(16).rjust(4) if u % 0x1000 == 0
+    
+    #fields = Array.new(codes.size + 1, -1.0)
+    fields = []
+    #fields[0] = u
+    
+    if vec1[0,0,0].nan?
+      #io.puts(fields.join(','))
+      next
+    end
+    
+    io.write([u].pack('U') + "(U+#{u.to_s(16).upcase.rjust(4,'0')})\t")
+    
+    arial.zip(codes).each do |vec2, i|
+      next if vec2[0,0,0].nan?
+      #if vec2[0,0,0].nan?
+      #  fields.push('-')
+      #  next
+      #end
+      
+      d = vec1 - vec2
+      fields.push([d.rms, i, [i].pack('U')])
+    end
+    
+    #io.puts(fields.join(','))
+    io.puts(fields.sort.take(10).collect{|rms, i, s| "#{i == u ? '*' : ' '}#{s}(#{rms.round(3).to_s.ljust(5,'0')})"}.join("\t"))
   end
   
-  #def confidence(other)
-  #  raise TypeError unless other.kind_of?(self.class)
-  #  
-  #  # 1. extract vector(s)/vector(s) features (e.g. dot production)
-  #  Learner
-  #  
-  #  # 2. extract matrix/matrix features (e.g. sum of elements)
-  #  
-  #  
-  #end
-  
+  io.close
+  exit
 end
 
 if ARGV.empty?
@@ -232,42 +136,33 @@ if ARGV.empty?
   exit
 end
 
+PI = Math::PI
 F = YARP::Utils::Font
-VEC_SIZE = Mat64::VEC_SIZE
-until ARGV.empty?
-  font_path = ARGV.shift
-  font_name = File.basename(font_path).sub(/\.[^\.]+$/, '')
-  
-  font = YARP::Utils::Font.new(font_path)
+CODES = [(0x20..0xd7ff), (0xf900..0xfffd)].collect(&:to_a).flatten.collect{|n| [n].pack('n')}
+
+TYPE = NArray::SFLOAT
+SHAPE = [8, 8, 8] # vec, x, y
+
+def create_matrices(font)
   cmap = font.get_cmaps.find{|cmap| cmap.format == 4}
   raise ArgumentError, 'cmap (format 4) not found' unless cmap
+  
   theta0 = case font
-  when F::CFF, F::OpenType, F::PsFont then -Math::PI / 2
-  when F::TrueType then Math::PI / 2
+  when F::PsFont then raise 'PsFont'
+  when F::OpenType then -PI / 2
+  when F::TrueType then PI / 2
   else raise 'must not happen'
   end
   
-  codes = [0x21..0x7e, 0xa1..0xff].collect{|xs| xs.collect{|x| [x].pack('n')}}.flatten
   hhea = font[:hhea]
   ascender, descender = hhea[:ascender], hhea[:descender]
   w = h = (ascender - descender).to_f
   
-  matrices = cmap.code2gid.values_at(*codes).collect do |gid|
-    glyph = Glyph.new(font, gid)
-    next unless glyph.valid?
-    xmin, ymin = glyph.xmin, glyph.ymin
-    xmax, ymax = glyph.xmax, glyph.ymax
-    points = glyph.coordinates.collect{|x1, y1, _| [x1.to_f, y1.to_f]}
+  invalid_mat = NArray.new(TYPE, *SHAPE).fill(Float::NAN)
+  gids = CODES.collect{|code| cmap.code2gid[code]}
+  gids.collect do |gid|
     
-    # normalize scale
-    points.collect!{|x1, y1| [x1 - xmin, y1]} if xmin < 0
-    points.collect!{|x1, y1| [x1, y1 - (ymin - descender)]} if ymin < descender
-    x_norm, y_norm = [w, xmax - xmin].max, [h, ymax - ymin].max
-    points.collect!{|x1, y1| [x1 / x_norm * 8, y1 / y_norm * 8]}
-    idx0 = 0
-    contours = glyph.eoc.collect{|idx| contour = points[idx0..idx] << points[idx0]; idx0 = idx + 1; contour}
-    
-    # mat64:
+    # mat:
     #   |y----------------------|
     #   |38 39 3a 3b 3c 3d 3e 3f|
     #   |30 31 32 33 34 35 36 37|
@@ -282,19 +177,51 @@ until ARGV.empty?
     # The direction of normal vector is in-to-out, i.e. right side of contour in PostScript font,
     # and left hand side of contour in TrueType font.
     # The norm of normal vector is the length of the line in the box.
-    #mat64 = Array.new(64){ NVector.float(16) }
-    mat64 = Mat64.new
+    
+    next invalid_mat if (gid.nil? || gid == 0)
+    
+    glyph = Glyph.new(font, gid)
+    next invalid_mat unless glyph.valid?
+    
+    mat = NArray.new(TYPE, *SHAPE)
+    vec_size = mat.shape.first
+    
+    xmin, ymin = glyph.xmin, glyph.ymin
+    xmax, ymax = glyph.xmax, glyph.ymax
+    points = glyph.coordinates.collect{|x1, y1, _| [x1.to_f, y1.to_f]}
+    
+    # normalize scale
+    points.collect!{|x1, y1| [x1 - xmin, y1]} if xmin < 0
+    points.collect!{|x1, y1| [x1, y1 - descender]}
+    ymin = points.collect(&:last).min
+    points.collect!{|x1, y1| [x1, y1 - ymin]} if ymin < 0
+    x_norm, y_norm = [w, *points.collect(&:first)].max, [h, *points.collect(&:last)].max
+    points.collect!{|x1, y1| [x1 / x_norm * 8.0, y1 / y_norm * 8.0]}
+    unless points.all?{|x1, y1| (0..8).include?(x1) && (0..8).include?(y1)}
+      p gid
+      puts
+      p %i{xmin ymin xmax ymax}.collect{|s|glyph.send(s)}
+      puts
+      pp glyph.coordinates
+      puts
+      pp points
+      raise "a"
+    end
+    
+    # create closed path
+    idx0 = 0
+    contours = glyph.eoc.collect{|idx| contour = points[idx0..idx] << points[idx0]; idx0 = idx + 1; contour}
     
     contours.each do |contour|
       contour.each_cons(2) do |pt0, pt1|
         x0, y0, x1, y1 = *pt0, *pt1
         theta = Math.atan2(y1 - y0, x1 - x0) + theta0
         if theta < 0
-          theta += Math::PI * 2
-        elsif Math::PI * 2 <= theta
-          theta -= Math::PI * 2
+          theta += PI * 2
+        elsif PI * 2 <= theta
+          theta -= PI * 2
         end
-        vec_idx = (theta / (Math::PI * 2) * VEC_SIZE).round % VEC_SIZE
+        vec_idx = (theta / (PI * 2) * vec_size).round % vec_size
         
         x0, x1, y0, y1 = *[x0, x1].minmax, *[y0, y1].minmax
         dx0 = x1 - x0
@@ -323,22 +250,58 @@ until ARGV.empty?
         nords.unshift(pt0); nords.push(pt1)
         nords.uniq.sort_by{|pt|pt[1]}.sort_by.with_index{|pt,i|[pt[0],i]}.each_cons(2) do |p0, p1|
           dx, dy = p0[0] - p1[0], p0[1] - p1[1]
-          norm = Math.sqrt(dx * dx + dy * dy)
-          raise [norm, dx, dy, p0, p1].to_s if 8 < norm
           x, y = p0[0].floor, p0[1].floor
           x = 7 if x == 8
           y = 7 if y == 8
-          mat64[x + y * 8][vec_idx] += norm / 8
+          norm = Math.hypot(dx, dy)
+          begin
+            mat[vec_idx, x, y] += norm / 8.0
+          rescue IndexError
+            p [vec_idx, x, y, p0, p1, gid]
+            raise
+          end
         end
       end
     end
     
-    [gid, mat64]
+    next mat
   end
+end
+
+until ARGV.empty?
+  $stdout.sync = true
+  font_path = ARGV.shift
+  font_name = File.basename(font_path).sub(/\.[^\.]+$/, '')
+  next unless /\.(ttf|otf|ttc)$/ =~ font_path
   
-  glyphs = codes.zip(matrices).collect{|code, (gid, mat)| GlyphMetrics.new(font_name, code.unpack('n')[0], gid, mat)}
-  output_path = "#{font_name}.vec"
-  puts "#{font_path} => ./#{output_path}"
-  open(output_path, 'wb:ASCII-8BIT') {|io| io.write(Marshal.dump(glyphs))}
+  font = YARP::Utils::Font.new(font_path)
+  if font.kind_of?(Array)
+    # ttc
+    font.each.with_index(1) do |fnt, i|
+      output_path = "./vec/#{font_name}_#{i}.vec"
+      next if File.exist?(output_path)
+      print "#{font_path} => #{output_path} ... "
+      mats = create_matrices(fnt)
+      size, zipsize = -1, -1
+      open(output_path, 'wb:ASCII-8BIT') do |io|
+        str = Marshal.dump(mats)
+        size = str.bytesize
+        zipsize = io.write(Zlib::Deflate.deflate(str))
+      end
+      puts "done (#{size/1024} KB / #{zipsize/1024} KB)"
+    end
+  else
+    output_path = "./vec/#{font_name}.vec"
+    next if File.exist?(output_path)
+    print "#{font_path} => #{output_path} ... "
+    mats = create_matrices(font)
+    size, zipsize = -1, -1
+    open(output_path, 'wb:ASCII-8BIT') do |io|
+      str = Marshal.dump(mats)
+      size = str.bytesize
+      zipsize = io.write(Zlib::Deflate.deflate(str))
+    end
+    puts "done (#{size/1024} KB / #{zipsize/1024} KB)"
+  end
   
 end

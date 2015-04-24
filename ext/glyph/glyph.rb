@@ -1,3 +1,17 @@
+class Integer
+  def to_f2dot14
+    raise TypeError, 'overflow' unless (0..0xffff).include?(self)
+    mantissa = case self >> 14
+      when 0 then 0
+      when 1 then 1
+      when 2 then -2
+      when 3 then -1
+    end
+    frac = Rational(self & 0b0011_1111_1111_1111, 16384)  # 16384 == 0b0100_0000_0000_0000
+    (mantissa + (mantissa < 0 ? -frac : frac)).to_f
+  end
+end
+
 class Glyph
   
   class << self
@@ -25,7 +39,10 @@ class Glyph
   
   def bsb; ah - (tsb + ymax - ymin) end
   
-  def valid?; !!@data && !@data.empty? end
+  #def valid?; !!@data && !@data.empty? end
+  def valid?; !@coordinates.empty? end
+  
+  def has_data?; !!@data && !@data.empty? end
   
   def composite?; false end
   
@@ -178,11 +195,14 @@ class TtGlyph < Glyph
   def initialize(*args)
     super
     @simple_glyph = true
-    return unless self.valid?
+    return unless self.has_data?
     d = StringIO.new(@data, 'rb:ASCII-8BIT')
     @nc = d.read(2).unpack('n').pack('s').unpack('s')[0]
     @simple_glyph = 0 <= @nc
     @xmin, @ymin, @xmax, @ymax = d.read(8).unpack('n4').pack('s4').unpack('s4')
+    # ^ these fields may have incorrect value...
+    # so take correct them after
+    
     if @simple_glyph
       *eoc, insn = d.read(@nc * 2 + 2).unpack('n*')
       @eoc = eoc
@@ -216,8 +236,8 @@ class TtGlyph < Glyph
         
         scale = case
         when flag[3] == 1
-          scale = d.read(2).unpack('n').to_f2dot14
-          Proc.new {|x, y| [x * scale, y * scale]}
+          scale_ = d.read(2).unpack('n')[0].to_f2dot14
+          Proc.new {|x, y| [x * scale_, y * scale_]}
         when flag[6] == 1
           scale_x, scale_y = d.read(4).unpack('n2').collect{|n| n.to_f2dot14}
           Proc.new {|x, y| [x * scale_x, y * scale_y]}
@@ -244,6 +264,13 @@ class TtGlyph < Glyph
         @insts = d.read(insn)
       end
     end
+    
+    @xmin, @xmax = @coordinates.collect{|pt| pt[0]}.minmax
+    @ymin, @ymax = @coordinates.collect{|pt| pt[1]}.minmax
+    @xmin ||= 0
+    @xmax ||= 0
+    @ymin ||= 0
+    @ymax ||= 0
   end
   
 end
@@ -252,7 +279,7 @@ class PsGlyph < Glyph
   
   def initialize(*args)
     super
-    return unless self.valid?
+    return unless self.has_data?
     
     dw, hints, ops = parse_ops(@data)
     return if ops == [:endchar]
