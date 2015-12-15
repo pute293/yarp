@@ -1,4 +1,4 @@
-#! ruby
+#! /usr/bin/env ruby
 
 require 'pp'
 require 'zlib'
@@ -65,7 +65,7 @@ if ARGV.empty?
     end
     
     #io.puts(fields.join(','))
-    io.puts(fields.sort.take(10).collect{|rms, i, s| "#{i == u ? '*' : ' '}#{s}(#{rms.round(3).to_s.ljust(5,'0')})"}.join("\t"))
+    io.puts(fields.sort.take(10).collect{|rms, i, s| "#{i == u ? '*' : ' '}#{s}(U+#{i.to_s(16).upcase.rjust(4,'0')} / #{rms.round(5).to_s.ljust(7,'0')})"}.join("\t"))
   end
   
   io.close
@@ -271,14 +271,14 @@ end
 until ARGV.empty?
   $stdout.sync = true
   font_path = ARGV.shift
-  font_name = File.basename(font_path).sub(/\.[^\.]+$/, '')
   next unless /\.(ttf|otf|ttc)$/ =~ font_path
   
   font = YARP::Utils::Font.new(font_path)
   if font.kind_of?(Array)
     # ttc
     font.each.with_index(1) do |fnt, i|
-      output_path = "./vec/#{font_name}_#{i}.vec"
+      font_name = fnt.fullname.select{|s| s.bytes.all?{|x| x < 0x80}}.fetch(0).gsub(' ', '-')
+      output_path = "./vec/#{font_name}.vec"
       next if File.exist?(output_path)
       print "#{font_path} => #{output_path} ... "
       mats = create_matrices(fnt)
@@ -291,6 +291,7 @@ until ARGV.empty?
       puts "done (#{size/1024} KB / #{zipsize/1024} KB)"
     end
   else
+    font_name = font.fullname.select{|s| s.bytes.all?{|x| x < 0x80}}.fetch(0).gsub(' ', '-')
     output_path = "./vec/#{font_name}.vec"
     next if File.exist?(output_path)
     print "#{font_path} => #{output_path} ... "

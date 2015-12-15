@@ -1,4 +1,4 @@
-#! ruby
+#! /usr/bin/env ruby
 
 require 'stringio'
 require 'pp'

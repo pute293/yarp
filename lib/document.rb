@@ -62,6 +62,7 @@ module YARP
     end
     
     def each_object
+      return enum_for(__method__) unless block_given?
       @xrefs.each {|xref|
         xref.each do |entry|
           obj = entry.realize

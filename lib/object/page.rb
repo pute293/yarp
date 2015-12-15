@@ -13,6 +13,7 @@ module YARP
     
     include Enumerable
     def each
+      return enum_for(__method__) unless block_given?
       count.times do |n|
         yield @pages[n]
       end
@@ -141,6 +142,7 @@ module YARP
     end
     
     def each_image
+      return enum_for(__method__) unless block_given?
       each_object {|obj| yield obj if obj.subtype == :Image }
     end
     
@@ -339,8 +341,8 @@ module YARP
       when 0 then nil
       when 1 then data[0]
       else
-        data
-        #raise NotImplementedError, 'multiple images'
+        #data
+        raise NotImplementedError, 'multiple images'
         #s = self.stream
       end
     end
